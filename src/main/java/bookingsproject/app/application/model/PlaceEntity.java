@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package bookingsproject.app.model;
+package bookingsproject.app.application.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,12 +25,30 @@ public class PlaceEntity  implements ApplicationEntity{
     private long id;
     private String title;
     private String description;
+    @Column(name = "image_url")
     private String imageUrl;
     private int price;
+    @Column(name = "avaiable_from")
     private Date avaiableFrom;
+    @Column(name = "avaiable_to")
     private Date avaiableTo;
+    @Column(name = "user_mail")
     private String userMail;
 
+    public PlaceEntity() {
+    }
+
+    public PlaceEntity(long id, String title, String description, String imageUrl, int price, Date avaiableFrom, Date avaiableTo, String userMail) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.imageUrl = imageUrl;
+        this.price = price;
+        this.avaiableFrom = avaiableFrom;
+        this.avaiableTo = avaiableTo;
+        this.userMail = userMail;
+    }
+    
     public long getId() {
         return id;
     }

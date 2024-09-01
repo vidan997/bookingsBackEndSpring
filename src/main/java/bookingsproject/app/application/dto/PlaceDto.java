@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package bookingsproject.app.dto;
+package bookingsproject.app.application.dto;
 
 import jakarta.validation.constraints.NotNull;
 import java.util.Date;
@@ -29,6 +29,20 @@ public class PlaceDto implements ApplicationDto{
     private Date avaiableTo;
     @NotNull
     private String userMail;
+
+    public PlaceDto() {
+    }
+    
+    public PlaceDto(long id, String title, String description, String imageUrl, int price, Date avaiableFrom, Date avaiableTo, String userMail) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.imageUrl = imageUrl;
+        this.price = price;
+        this.avaiableFrom = avaiableFrom;
+        this.avaiableTo = avaiableTo;
+        this.userMail = userMail;
+    }
 
     public long getId() {
         return id;

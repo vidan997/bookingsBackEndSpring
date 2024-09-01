@@ -2,10 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
-package bookingsproject.app.converter;
+package bookingsproject.app.application.converter;
 
-import bookingsproject.app.dto.ApplicationDto;
-import bookingsproject.app.model.ApplicationEntity;
+import bookingsproject.app.application.dto.ApplicationDto;
+import bookingsproject.app.application.model.ApplicationEntity;
+
 
 /**
  *

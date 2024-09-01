@@ -2,12 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
-package bookingsproject.app.service;
+package bookingsproject.app.application.model;
 
 /**
  *
- * @author Munja
+ * @author student2
  */
-public interface BookingService {
+public interface ApplicationEntity {
     
 }

@@ -2,9 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
-package bookingsproject.app.service;
+package bookingsproject.app.application.service;
 
-import bookingsproject.app.dto.UserDto;
+import bookingsproject.app.application.dto.UserDto;
 import jakarta.persistence.EntityExistsException;
 import java.util.Optional;
 
