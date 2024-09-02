@@ -5,7 +5,10 @@
 package bookingsproject.app.application.service;
 
 import bookingsproject.app.application.dto.PlaceDto;
+import bookingsproject.app.application.exception.InvalidEntityException;
+import jakarta.persistence.EntityExistsException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -14,4 +17,10 @@ import java.util.List;
 public interface PlaceService {
     
     List<PlaceDto> findAll();
+    
+    Optional<PlaceDto> findById(Long id);
+
+    PlaceDto save(PlaceDto placeDto) throws EntityExistsException;
+
+    void deleteById(Long id) throws InvalidEntityException;
 }

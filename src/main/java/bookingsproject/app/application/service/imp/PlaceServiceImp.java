@@ -6,10 +6,14 @@ package bookingsproject.app.application.service.imp;
 
 import bookingsproject.app.application.converter.PlaceConverter;
 import bookingsproject.app.application.dto.PlaceDto;
+import bookingsproject.app.application.exception.InvalidEntityException;
+import bookingsproject.app.application.model.PlaceEntity;
 import bookingsproject.app.application.repository.PlaceRepository;
 import bookingsproject.app.application.service.PlaceService;
+import jakarta.persistence.EntityExistsException;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +39,30 @@ public class PlaceServiceImp implements PlaceService{
         return placeRepository.findAll().stream().map(entity -> {
             return placeConverter.toDto(entity);
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<PlaceDto> findById(Long id) {
+        Optional<PlaceEntity> entity = placeRepository.findById(id);
+        if (entity.isPresent()) {
+            return Optional.of(placeConverter.toDto(entity.get()));
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public PlaceDto save(PlaceDto placeDto) throws EntityExistsException {
+        Optional<PlaceEntity> entity = placeRepository.findByTitle(placeDto.getTitle());
+        if (entity.isPresent()) {
+            throw new EntityExistsException("Place already exist!");
+        }
+        PlaceEntity place = placeRepository.save(placeConverter.toEntity(placeDto));
+        return placeConverter.toDto(place);
+    }
+
+    @Override
+    public void deleteById(Long id) throws InvalidEntityException {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
     
     
