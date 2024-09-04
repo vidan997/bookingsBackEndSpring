@@ -21,6 +21,8 @@ public interface PlaceService {
     Optional<PlaceDto> findById(Long id);
 
     PlaceDto save(PlaceDto placeDto) throws EntityExistsException;
-
-    void deleteById(Long id) throws InvalidEntityException;
+    
+    PlaceDto update(PlaceDto placeDto);
+    
+    List<PlaceDto> findByUserMail(String userMail);
 }

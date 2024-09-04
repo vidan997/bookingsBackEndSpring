@@ -13,6 +13,7 @@ import java.util.Date;
  */
 public class PlaceDto implements ApplicationDto{
     
+    @NotNull
     private long id;
     @NotNull
     private String title;

@@ -15,6 +15,7 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import static org.hibernate.query.results.Builders.entity;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,10 +24,10 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Transactional
-public class PlaceServiceImp implements PlaceService{
-    
+public class PlaceServiceImp implements PlaceService {
+
     private final PlaceRepository placeRepository;
-    
+
     private final PlaceConverter placeConverter;
 
     public PlaceServiceImp(PlaceRepository placeRepository, PlaceConverter placeConverter) {
@@ -37,6 +38,7 @@ public class PlaceServiceImp implements PlaceService{
     @Override
     public List<PlaceDto> findAll() {
         return placeRepository.findAll().stream().map(entity -> {
+            System.out.println(entity.getImageUrl());
             return placeConverter.toDto(entity);
         }).collect(Collectors.toList());
     }
@@ -61,10 +63,16 @@ public class PlaceServiceImp implements PlaceService{
     }
 
     @Override
-    public void deleteById(Long id) throws InvalidEntityException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public PlaceDto update(PlaceDto placeDto) {
+        PlaceEntity place = placeRepository.save(placeConverter.toEntity(placeDto));
+        return placeConverter.toDto(place);
     }
-    
-    
-    
+
+    @Override
+    public List<PlaceDto> findByUserMail(String userMail) {
+        return placeRepository.findByUserMail(userMail).stream().map(entity -> {
+            return placeConverter.toDto(entity);
+        }).collect(Collectors.toList());
+    }
+
 }
