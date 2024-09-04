@@ -4,6 +4,7 @@
  */
 package bookingsproject.app.application.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,14 +23,41 @@ public class BookingEntity  implements ApplicationEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @Column(name = "placeid")
     private long placeId;
+    @Column(name = "usermail")
     private String userMail;
+    @Column(name = "first_name")
     private String firstName;
+    @Column(name = "last_name")
     private String lastName;
-    private int questNumber;
+    @Column(name = "guest_number")
+    private int guestNumber;
+    @Column(name = "booked_from")
     private Date bookedFrom;
+    @Column(name = "booked_to")
     private Date bookedTo;
+    @Column(name = "place_title")
+    private String placeTitle;
+    @Column(name = "place_image")
+    private String placeImage;
 
+    public BookingEntity() {
+    }
+   
+    public BookingEntity(long id, long placeId, String userMail, String firstName, String lastName, int guestNumber, Date bookedFrom, Date bookedTo, String placeTitle, String placeImage) {
+        this.id = id;
+        this.placeId = placeId;
+        this.userMail = userMail;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.guestNumber = guestNumber;
+        this.bookedFrom = bookedFrom;
+        this.bookedTo = bookedTo;
+        this.placeTitle = placeTitle;
+        this.placeImage = placeImage;
+    }
+    
     public long getId() {
         return id;
     }
@@ -70,12 +98,12 @@ public class BookingEntity  implements ApplicationEntity{
         this.lastName = lastName;
     }
 
-    public int getQuestNumber() {
-        return questNumber;
+    public int getGuestNumber() {
+        return guestNumber;
     }
 
-    public void setQuestNumber(int questNumber) {
-        this.questNumber = questNumber;
+    public void setGuestNumber(int guestNumber) {
+        this.guestNumber = guestNumber;
     }
 
     public Date getBookedFrom() {
@@ -118,7 +146,7 @@ public class BookingEntity  implements ApplicationEntity{
         if (this.placeId != other.placeId) {
             return false;
         }
-        if (this.questNumber != other.questNumber) {
+        if (this.guestNumber != other.guestNumber) {
             return false;
         }
         if (!Objects.equals(this.userMail, other.userMail)) {
@@ -138,7 +166,24 @@ public class BookingEntity  implements ApplicationEntity{
 
     @Override
     public String toString() {
-        return "BookingEntity{" + "id=" + id + ", placeId=" + placeId + ", userMail=" + userMail + ", firstName=" + firstName + ", lastName=" + lastName + ", questNumber=" + questNumber + ", bookedFrom=" + bookedFrom + ", bookedTo=" + bookedTo + '}';
+        return "BookingEntity{" + "id=" + id + ", placeId=" + placeId + ", userMail=" + userMail + ", firstName=" + firstName + ", lastName=" + lastName + ", questNumber=" + guestNumber + ", bookedFrom=" + bookedFrom + ", bookedTo=" + bookedTo + '}';
     }
+
+    public String getPlaceTitle() {
+        return placeTitle;
+    }
+
+    public void setPlaceTitle(String placeTitle) {
+        this.placeTitle = placeTitle;
+    }
+
+    public String getPlaceImage() {
+        return placeImage;
+    }
+
+    public void setPlaceImage(String placeImage) {
+        this.placeImage = placeImage;
+    }
+    
     
 }

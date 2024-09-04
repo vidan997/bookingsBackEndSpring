@@ -4,6 +4,7 @@
  */
 package bookingsproject.app.application.controller;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/user")
+@CrossOrigin(origins = "http://localhost:8100")
 public class UserRestController {
     
 }
