@@ -4,7 +4,11 @@
  */
 package bookingsproject.app.application.service;
 
+import bookingsproject.app.application.converter.UserConverter;
 import bookingsproject.app.application.dto.UserDto;
+import bookingsproject.app.application.exception.InvalidEntityException;
+import bookingsproject.app.application.model.UserEntity;
+import bookingsproject.app.application.repository.UserRepository;
 import jakarta.persistence.EntityExistsException;
 import java.util.Optional;
 
@@ -12,9 +16,9 @@ import java.util.Optional;
  *
  * @author Munja
  */
+
 public interface UserService {
+
     
-    Optional<UserDto> findByEmail(String email);
     
-    UserDto save(UserDto userDto) throws EntityExistsException;
 }

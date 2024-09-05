@@ -4,25 +4,26 @@
  */
 package bookingsproject.app.application.service.imp;
 
-import bookingsproject.app.application.dto.UserDto;
+import bookingsproject.app.application.converter.UserConverter;
+import bookingsproject.app.application.repository.UserRepository;
 import bookingsproject.app.application.service.UserService;
-import jakarta.persistence.EntityExistsException;
-import java.util.Optional;
+import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author Munja
  */
-public class UserServiceImp implements UserService{
+@Service
+@Transactional
+public class UserServiceImp implements UserService {
 
-    @Override
-    public Optional<UserDto> findByEmail(String email) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    private final UserRepository userRepository;
+    private final UserConverter userConverter;
+
+    public UserServiceImp(UserRepository userRepository, UserConverter userConverter) {
+        this.userRepository = userRepository;
+        this.userConverter = userConverter;
     }
 
-    @Override
-    public UserDto save(UserDto userDto) throws EntityExistsException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-    
 }

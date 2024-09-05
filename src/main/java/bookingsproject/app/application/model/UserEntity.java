@@ -4,13 +4,21 @@
  */
 package bookingsproject.app.application.model;
 
+import bookingsproject.app.application.role.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.GeneratedValue;
+import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 /**
  *
@@ -18,17 +26,22 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "user")
-public class UserEntity  implements ApplicationEntity{
-    @Id   
-    @Column(name = "userMail")
-    private String email;
-    
-    @Column(name = "userPass")
-    private String password;
+public class UserEntity implements ApplicationEntity, UserDetails {
 
-    public UserEntity(){
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "userid")
+    private long id;
+    @Column(name = "user_mail")
+    private String email;
+    @Column(name = "user_pass")
+    private String password;
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    public UserEntity() {
     }
-    
+
     public UserEntity(String email, String password) {
         this.email = email;
         this.password = password;
@@ -42,6 +55,7 @@ public class UserEntity  implements ApplicationEntity{
         this.email = email;
     }
 
+    @Override
     public String getPassword() {
         return password;
     }
@@ -77,7 +91,37 @@ public class UserEntity  implements ApplicationEntity{
     @Override
     public String toString() {
         return "UserEntity{" + "email=" + email + ", password=" + password + '}';
+
     }
 
-    
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.name()));
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override 
+    public boolean isEnabled() {
+        return true;
+    }
+
 }
