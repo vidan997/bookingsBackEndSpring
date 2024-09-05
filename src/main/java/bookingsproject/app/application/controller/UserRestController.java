@@ -33,11 +33,11 @@ public class UserRestController {
     
     @PostMapping("/signin")
     public ResponseEntity<AuthenticationReponseDto> signIn(@RequestBody UserDto request){
-        return null;
+        return ResponseEntity.ok(userService.signIn(request));
     }
     
     @PostMapping("/signup")
     public ResponseEntity<AuthenticationReponseDto> signUp(@RequestBody UserDto request){
-        return null;
+        return ResponseEntity.ok(userService.signUp(request));
     }
 }

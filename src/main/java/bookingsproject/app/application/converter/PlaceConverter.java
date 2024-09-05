@@ -17,12 +17,12 @@ public class PlaceConverter implements GenericConverter<PlaceDto,PlaceEntity>{
 
     @Override
     public PlaceEntity toEntity(PlaceDto dto) {
-        return new PlaceEntity(dto.getId(),dto.getTitle(),dto.getDescription(),dto.getImageUrl(),dto.getPrice(),dto.getAvaiableFrom(),dto.getAvaiableTo(),dto.getUserMail());
+        return new PlaceEntity(dto.getId(),dto.getTitle(),dto.getDescription(),dto.getImageUrl(),dto.getPrice(),dto.getAvaiableFrom(),dto.getAvaiableTo(),dto.getUserId());
     }
 
     @Override
     public PlaceDto toDto(PlaceEntity entity) {
-        return new PlaceDto(entity.getId(),entity.getTitle(),entity.getDescription(),entity.getImageUrl(),entity.getPrice(),entity.getAvaiableFrom(),entity.getAvaiableTo(),entity.getUserMail());
+        return new PlaceDto(entity.getId(),entity.getTitle(),entity.getDescription(),entity.getImageUrl(),entity.getPrice(),entity.getAvaiableFrom(),entity.getAvaiableTo(),entity.getUserId());
     }
     
 }

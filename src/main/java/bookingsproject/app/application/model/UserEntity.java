@@ -39,12 +39,22 @@ public class UserEntity implements ApplicationEntity, UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    public UserEntity(long id, String email, String password, Role role) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+
     public UserEntity() {
     }
 
-    public UserEntity(String email, String password) {
-        this.email = email;
-        this.password = password;
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getEmail() {
@@ -64,34 +74,12 @@ public class UserEntity implements ApplicationEntity, UserDetails {
         this.password = password;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        return hash;
+    public Role getRole() {
+        return role;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final UserEntity other = (UserEntity) obj;
-        if (!Objects.equals(this.email, other.email)) {
-            return false;
-        }
-        return Objects.equals(this.password, other.password);
-    }
-
-    @Override
-    public String toString() {
-        return "UserEntity{" + "email=" + email + ", password=" + password + '}';
-
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     @Override

@@ -5,6 +5,7 @@
 package bookingsproject.app.application.service;
 
 import bookingsproject.app.application.converter.UserConverter;
+import bookingsproject.app.application.dto.AuthenticationReponseDto;
 import bookingsproject.app.application.dto.UserDto;
 import bookingsproject.app.application.exception.InvalidEntityException;
 import bookingsproject.app.application.model.UserEntity;
@@ -19,6 +20,10 @@ import java.util.Optional;
 
 public interface UserService {
 
+    public AuthenticationReponseDto signUp(UserDto userDto);
+    
+    
+    public AuthenticationReponseDto signIn(UserDto userDto);
     
     
 }

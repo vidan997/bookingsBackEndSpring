@@ -18,12 +18,12 @@ public class BookingConverter implements GenericConverter<BookingDto, BookingEnt
 
     @Override
     public BookingEntity toEntity(BookingDto dto) {
-        return new BookingEntity(dto.getId(), dto.getPlaceId(), dto.getUserMail(), dto.getFirstName(), dto.getLastName(), dto.getGuestNumber(), dto.getBookedFrom(), dto.getBookedTo(), dto.getPlaceTitle(), dto.getPlaceImage());
+        return new BookingEntity(dto.getId(), dto.getPlaceId(), dto.getUserId(), dto.getFirstName(), dto.getLastName(), dto.getGuestNumber(), dto.getBookedFrom(), dto.getBookedTo(), dto.getPlaceTitle(), dto.getPlaceImage());
     }
 
     @Override
     public BookingDto toDto(BookingEntity entity) {
-        return new BookingDto(entity.getId(), entity.getPlaceId(), entity.getUserMail(), entity.getFirstName(), entity.getLastName(), entity.getGuestNumber(), entity.getBookedFrom(), entity.getBookedTo(), entity.getPlaceTitle(), entity.getPlaceImage());
+        return new BookingDto(entity.getId(), entity.getPlaceId(), entity.getUserId(), entity.getFirstName(), entity.getLastName(), entity.getGuestNumber(), entity.getBookedFrom(), entity.getBookedTo(), entity.getPlaceTitle(), entity.getPlaceImage());
     }
     
 }

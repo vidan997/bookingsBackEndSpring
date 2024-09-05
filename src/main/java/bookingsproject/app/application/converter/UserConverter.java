@@ -7,6 +7,8 @@ package bookingsproject.app.application.converter;
 import bookingsproject.app.application.dto.UserDto;
 import bookingsproject.app.application.model.ApplicationEntity;
 import bookingsproject.app.application.model.UserEntity;
+import bookingsproject.app.application.role.Role;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,9 +18,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserConverter implements GenericConverter<UserDto, UserEntity>{
 
+    private final PasswordEncoder passwordEncoder;
+
+    public UserConverter(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+    
     @Override
     public UserEntity toEntity(UserDto dto) {
-       return new UserEntity(dto.getEmail(), dto.getPassword());
+       return new UserEntity(0, dto.getEmail(), passwordEncoder.encode(dto.getPassword()), Role.USER);
     }
 
     @Override

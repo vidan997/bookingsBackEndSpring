@@ -25,8 +25,8 @@ public class BookingEntity  implements ApplicationEntity{
     private long id;
     @Column(name = "placeid")
     private long placeId;
-    @Column(name = "usermail")
-    private String userMail;
+    @Column(name = "userid")
+    private String userid;
     @Column(name = "first_name")
     private String firstName;
     @Column(name = "last_name")
@@ -45,10 +45,10 @@ public class BookingEntity  implements ApplicationEntity{
     public BookingEntity() {
     }
    
-    public BookingEntity(long id, long placeId, String userMail, String firstName, String lastName, int guestNumber, Date bookedFrom, Date bookedTo, String placeTitle, String placeImage) {
+    public BookingEntity(long id, long placeId, String userid, String firstName, String lastName, int guestNumber, Date bookedFrom, Date bookedTo, String placeTitle, String placeImage) {
         this.id = id;
         this.placeId = placeId;
-        this.userMail = userMail;
+        this.userid = userid;
         this.firstName = firstName;
         this.lastName = lastName;
         this.guestNumber = guestNumber;
@@ -74,12 +74,12 @@ public class BookingEntity  implements ApplicationEntity{
         this.placeId = placeId;
     }
 
-    public String getUserMail() {
-        return userMail;
+    public String getUserId() {
+        return userid;
     }
 
-    public void setUserMail(String userMail) {
-        this.userMail = userMail;
+    public void setUserId(String userid) {
+        this.userid = userid;
     }
 
     public String getFirstName() {
@@ -149,7 +149,7 @@ public class BookingEntity  implements ApplicationEntity{
         if (this.guestNumber != other.guestNumber) {
             return false;
         }
-        if (!Objects.equals(this.userMail, other.userMail)) {
+        if (!Objects.equals(this.userid, other.userid)) {
             return false;
         }
         if (!Objects.equals(this.firstName, other.firstName)) {
@@ -166,7 +166,7 @@ public class BookingEntity  implements ApplicationEntity{
 
     @Override
     public String toString() {
-        return "BookingEntity{" + "id=" + id + ", placeId=" + placeId + ", userMail=" + userMail + ", firstName=" + firstName + ", lastName=" + lastName + ", questNumber=" + guestNumber + ", bookedFrom=" + bookedFrom + ", bookedTo=" + bookedTo + '}';
+        return "BookingEntity{" + "id=" + id + ", placeId=" + placeId + ", userMail=" + userid + ", firstName=" + firstName + ", lastName=" + lastName + ", questNumber=" + guestNumber + ", bookedFrom=" + bookedFrom + ", bookedTo=" + bookedTo + '}';
     }
 
     public String getPlaceTitle() {

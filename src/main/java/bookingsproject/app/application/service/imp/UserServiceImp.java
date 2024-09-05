@@ -4,10 +4,18 @@
  */
 package bookingsproject.app.application.service.imp;
 
+import bookingsproject.app.application.config.jwt.service.JwtService;
 import bookingsproject.app.application.converter.UserConverter;
+import bookingsproject.app.application.dto.AuthenticationReponseDto;
+import bookingsproject.app.application.dto.UserDto;
+import bookingsproject.app.application.model.UserEntity;
 import bookingsproject.app.application.repository.UserRepository;
 import bookingsproject.app.application.service.UserService;
 import jakarta.transaction.Transactional;
+import java.util.Date;
+import java.util.Optional;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,10 +28,34 @@ public class UserServiceImp implements UserService {
 
     private final UserRepository userRepository;
     private final UserConverter userConverter;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
-    public UserServiceImp(UserRepository userRepository, UserConverter userConverter) {
+    public UserServiceImp(UserRepository userRepository, UserConverter userConverter, JwtService jwtService, AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
         this.userConverter = userConverter;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
+    }
+
+    @Override
+    public AuthenticationReponseDto signUp(UserDto userDto) {
+        UserEntity userEntity = userConverter.toEntity(userDto);
+        UserEntity entity = userRepository.save(userEntity);
+        String jwtToken = jwtService.generateToken(userEntity);
+        Date expDate = jwtService.extractExpiration(jwtToken);
+        return new AuthenticationReponseDto(entity.getUsername(), entity.getId(), jwtToken, expDate);
+    }
+
+    @Override
+    public AuthenticationReponseDto signIn(UserDto userDto) {
+        authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
+        
+        Optional<UserEntity> userEntity = userRepository.findByEmail(userDto.getEmail());
+        String jwtToken = jwtService.generateToken(userEntity.get());
+        Date expDate = jwtService.extractExpiration(jwtToken);
+        return new AuthenticationReponseDto(userEntity.get().getUsername(), userEntity.get().getId(), jwtToken, expDate);
     }
 
 }

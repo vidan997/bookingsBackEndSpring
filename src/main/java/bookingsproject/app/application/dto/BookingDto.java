@@ -18,7 +18,7 @@ public class BookingDto implements ApplicationDto{
     @NotNull
     private long placeId;
     @NotNull
-    private String userMail;
+    private String userid;
     @NotNull
     private String firstName;
     @NotNull
@@ -34,10 +34,10 @@ public class BookingDto implements ApplicationDto{
     @NotNull
     private String placeImage;
 
-    public BookingDto(long id, long placeId, String userMail, String firstName, String lastName, int guestNumber, Date bookedFrom, Date bookedTo, String placeTitle, String placeImage) {
+    public BookingDto(long id, long placeId, String userid, String firstName, String lastName, int guestNumber, Date bookedFrom, Date bookedTo, String placeTitle, String placeImage) {
         this.id = id;
         this.placeId = placeId;
-        this.userMail = userMail;
+        this.userid = userid;
         this.firstName = firstName;
         this.lastName = lastName;
         this.guestNumber = guestNumber;
@@ -66,12 +66,12 @@ public class BookingDto implements ApplicationDto{
         this.placeId = placeId;
     }
 
-    public String getUserMail() {
-        return userMail;
+    public String getUserId() {
+        return userid;
     }
 
-    public void setUserMail(String userMail) {
-        this.userMail = userMail;
+    public void setUserId(String userid) {
+        this.userid = userid;
     }
 
     public String getFirstName() {

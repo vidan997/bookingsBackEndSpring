@@ -32,13 +32,13 @@ public class PlaceEntity  implements ApplicationEntity{
     private Date avaiableFrom;
     @Column(name = "avaiable_to")
     private Date avaiableTo;
-    @Column(name = "user_mail")
-    private String userMail;
+    @Column(name = "userid")
+    private String userid;
 
     public PlaceEntity() {
     }
 
-    public PlaceEntity(long id, String title, String description, String imageUrl, int price, Date avaiableFrom, Date avaiableTo, String userMail) {
+    public PlaceEntity(long id, String title, String description, String imageUrl, int price, Date avaiableFrom, Date avaiableTo, String userid) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -46,7 +46,7 @@ public class PlaceEntity  implements ApplicationEntity{
         this.price = price;
         this.avaiableFrom = avaiableFrom;
         this.avaiableTo = avaiableTo;
-        this.userMail = userMail;
+        this.userid = userid;
     }
     
     public long getId() {
@@ -105,12 +105,12 @@ public class PlaceEntity  implements ApplicationEntity{
         this.avaiableTo = avaiableTo;
     }
 
-    public String getUserMail() {
-        return userMail;
+    public String getUserId() {
+        return userid;
     }
 
-    public void setUserMail(String userMail) {
-        this.userMail = userMail;
+    public void setUserId(String userid) {
+        this.userid = userid;
     }
 
     @Override
@@ -146,7 +146,7 @@ public class PlaceEntity  implements ApplicationEntity{
         if (!Objects.equals(this.imageUrl, other.imageUrl)) {
             return false;
         }
-        if (!Objects.equals(this.userMail, other.userMail)) {
+        if (!Objects.equals(this.userid, other.userid)) {
             return false;
         }
         if (!Objects.equals(this.avaiableFrom, other.avaiableFrom)) {
@@ -157,7 +157,7 @@ public class PlaceEntity  implements ApplicationEntity{
 
     @Override
     public String toString() {
-        return "PlaceEntity{" + "id=" + id + ", title=" + title + ", description=" + description + ", imageUrl=" + imageUrl + ", price=" + price + ", avaiableFrom=" + avaiableFrom + ", avaiableTo=" + avaiableTo + ", userMail=" + userMail + '}';
+        return "PlaceEntity{" + "id=" + id + ", title=" + title + ", description=" + description + ", imageUrl=" + imageUrl + ", price=" + price + ", avaiableFrom=" + avaiableFrom + ", avaiableTo=" + avaiableTo + ", userMail=" + userid + '}';
     }
     
     
