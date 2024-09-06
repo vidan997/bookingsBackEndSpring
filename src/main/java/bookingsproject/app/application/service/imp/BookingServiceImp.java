@@ -35,7 +35,7 @@ public class BookingServiceImp implements BookingService{
 
     @Override
     public List<BookingDto> findByUserMail(String userMail) {
-        return bookingRepository.findByUserMail(userMail).stream().map(entity -> {
+        return bookingRepository.findByUserid(userMail).stream().map(entity -> {
             return bookingConverter.toDto(entity);
         }).collect(Collectors.toList());}
 

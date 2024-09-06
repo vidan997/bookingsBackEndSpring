@@ -70,7 +70,7 @@ public class PlaceServiceImp implements PlaceService {
 
     @Override
     public List<PlaceDto> findByUserMail(String userMail) {
-        return placeRepository.findByUserMail(userMail).stream().map(entity -> {
+        return placeRepository.findByUserid(userMail).stream().map(entity -> {
             return placeConverter.toDto(entity);
         }).collect(Collectors.toList());
     }

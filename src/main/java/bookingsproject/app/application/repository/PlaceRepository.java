@@ -20,6 +20,6 @@ public interface PlaceRepository extends JpaRepository<PlaceEntity, Long>{
     
     Optional<PlaceEntity> findByTitle(String title);
     
-    List<PlaceEntity> findByUserMail(String userMail);
+    List<PlaceEntity> findByUserid(String userMail);
     
 }

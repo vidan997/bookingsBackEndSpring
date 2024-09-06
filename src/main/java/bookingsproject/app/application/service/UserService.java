@@ -20,10 +20,10 @@ import java.util.Optional;
 
 public interface UserService {
 
-    public AuthenticationReponseDto signUp(UserDto userDto);
+    public AuthenticationReponseDto signUp(UserDto userDto) throws Exception;
     
     
-    public AuthenticationReponseDto signIn(UserDto userDto);
+    public AuthenticationReponseDto signIn(UserDto userDto)throws Exception;
     
     
 }

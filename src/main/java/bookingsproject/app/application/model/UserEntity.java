@@ -32,7 +32,7 @@ public class UserEntity implements ApplicationEntity, UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "userid")
     private long id;
-    @Column(name = "user_mail")
+    @Column(name = "user_mail", unique = true)
     private String email;
     @Column(name = "user_pass")
     private String password;
@@ -107,7 +107,7 @@ public class UserEntity implements ApplicationEntity, UserDetails {
         return true;
     }
 
-    @Override 
+    @Override
     public boolean isEnabled() {
         return true;
     }

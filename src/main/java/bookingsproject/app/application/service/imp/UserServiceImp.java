@@ -12,9 +12,11 @@ import bookingsproject.app.application.model.UserEntity;
 import bookingsproject.app.application.repository.UserRepository;
 import bookingsproject.app.application.service.UserService;
 import jakarta.transaction.Transactional;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Date;
 import java.util.Optional;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
@@ -39,19 +41,28 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public AuthenticationReponseDto signUp(UserDto userDto) {
+    public AuthenticationReponseDto signUp(UserDto userDto) throws Exception {
         UserEntity userEntity = userConverter.toEntity(userDto);
-        UserEntity entity = userRepository.save(userEntity);
+        UserEntity entity;
+        try {
+            entity = userRepository.save(userEntity);
+        } catch (Exception e) {
+            throw new Exception("Email already taken!");
+        }
+
         String jwtToken = jwtService.generateToken(userEntity);
         Date expDate = jwtService.extractExpiration(jwtToken);
         return new AuthenticationReponseDto(entity.getUsername(), entity.getId(), jwtToken, expDate);
     }
 
     @Override
-    public AuthenticationReponseDto signIn(UserDto userDto) {
-        authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
-        
+    public AuthenticationReponseDto signIn(UserDto userDto) throws Exception {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
+        } catch (BadCredentialsException e) {
+            throw new Exception("Incorrect username or password", e);
+        }
         Optional<UserEntity> userEntity = userRepository.findByEmail(userDto.getEmail());
         String jwtToken = jwtService.generateToken(userEntity.get());
         Date expDate = jwtService.extractExpiration(jwtToken);
