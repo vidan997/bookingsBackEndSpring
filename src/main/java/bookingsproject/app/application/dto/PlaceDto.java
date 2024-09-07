@@ -28,7 +28,7 @@ public class PlaceDto implements ApplicationDto{
     @NotNull
     private Date avaiableTo;
     @NotNull
-    private String userid;
+    private String userId;
 
     public PlaceDto() {
     }
@@ -41,7 +41,7 @@ public class PlaceDto implements ApplicationDto{
         this.price = price;
         this.avaiableFrom = avaiableFrom;
         this.avaiableTo = avaiableTo;
-        this.userid = userid;
+        this.userId = userid;
     }
 
     public long getId() {
@@ -101,11 +101,11 @@ public class PlaceDto implements ApplicationDto{
     }
 
     public String getUserId() {
-        return userid;
+        return userId;
     }
 
     public void setUserId(String userid) {
-        this.userid = userid;
+        this.userId = userid;
     }
     
     
