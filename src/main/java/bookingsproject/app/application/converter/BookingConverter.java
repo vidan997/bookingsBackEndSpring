@@ -22,7 +22,9 @@ public class BookingConverter implements GenericConverter<BookingDto, BookingEnt
                 dto.getPriceAtBooking(),
                 dto.getPlaceTitle(),
                 dto.getPlaceImage(),
-                dto.getOwnerPhone()
+                dto.getOwnerPhone(),
+                dto.getPaypalOrderId(),
+                dto.getPaypalCaptureId()
         );
     }
 
@@ -41,7 +43,9 @@ public class BookingConverter implements GenericConverter<BookingDto, BookingEnt
                 entity.getPriceAtBooking(),
                 entity.getPlaceTitle(),
                 entity.getPlaceImage(),
-                entity.getOwnerPhone()
+                entity.getOwnerPhone(),
+                entity.getPaypalOrderId(),
+                entity.getPaypalCaptureId()
         );
     }
 }

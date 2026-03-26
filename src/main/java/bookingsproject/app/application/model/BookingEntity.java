@@ -53,12 +53,19 @@ public class BookingEntity implements ApplicationEntity {
     @Column(name = "owner_phone")
     private String ownerPhone;
 
+    @Column(name = "paypal_order_id")
+    private String paypalOrderId;
+
+    @Column(name = "paypal_capture_id")
+    private String paypalCaptureId;
+
     public BookingEntity() {
     }
 
     public BookingEntity(long id, long placeId, long roomid, String userid, String firstName, String lastName,
-                         Date bookedFrom, Date bookedTo, String roomType, double priceAtBooking,
-                         String placeTitle, String placeImage, String ownerPhone) {
+            Date bookedFrom, Date bookedTo, String roomType, double priceAtBooking,
+            String placeTitle, String placeImage, String ownerPhone,
+            String paypalOrderId, String paypalCaptureId) {
         this.id = id;
         this.placeId = placeId;
         this.roomid = roomid;
@@ -72,68 +79,183 @@ public class BookingEntity implements ApplicationEntity {
         this.placeTitle = placeTitle;
         this.placeImage = placeImage;
         this.ownerPhone = ownerPhone;
+        this.paypalOrderId = paypalOrderId;
+        this.paypalCaptureId = paypalCaptureId;
     }
 
-    public long getId() { return id; }
-    public void setId(long id) { this.id = id; }
+    public long getId() {
+        return id;
+    }
 
-    public long getPlaceId() { return placeId; }
-    public void setPlaceId(long placeId) { this.placeId = placeId; }
+    public void setId(long id) {
+        this.id = id;
+    }
 
-    public long getRoomid() { return roomid; }
-    public void setRoomid(long roomid) { this.roomid = roomid; }
+    public long getPlaceId() {
+        return placeId;
+    }
 
-    public String getUserId() { return userid; }
-    public void setUserId(String userid) { this.userid = userid; }
+    public void setPlaceId(long placeId) {
+        this.placeId = placeId;
+    }
 
-    public String getFirstName() { return firstName; }
-    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public long getRoomid() {
+        return roomid;
+    }
 
-    public String getLastName() { return lastName; }
-    public void setLastName(String lastName) { this.lastName = lastName; }
+    public void setRoomid(long roomid) {
+        this.roomid = roomid;
+    }
 
-    public Date getBookedFrom() { return bookedFrom; }
-    public void setBookedFrom(Date bookedFrom) { this.bookedFrom = bookedFrom; }
+    public String getUserId() {
+        return userid;
+    }
 
-    public Date getBookedTo() { return bookedTo; }
-    public void setBookedTo(Date bookedTo) { this.bookedTo = bookedTo; }
+    public void setUserId(String userid) {
+        this.userid = userid;
+    }
 
-    public String getRoomType() { return roomType; }
-    public void setRoomType(String roomType) { this.roomType = roomType; }
+    public String getFirstName() {
+        return firstName;
+    }
 
-    public double getPriceAtBooking() { return priceAtBooking; }
-    public void setPriceAtBooking(double priceAtBooking) { this.priceAtBooking = priceAtBooking; }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-    public String getPlaceTitle() { return placeTitle; }
-    public void setPlaceTitle(String placeTitle) { this.placeTitle = placeTitle; }
+    public String getLastName() {
+        return lastName;
+    }
 
-    public String getPlaceImage() { return placeImage; }
-    public void setPlaceImage(String placeImage) { this.placeImage = placeImage; }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
-    public String getOwnerPhone() { return ownerPhone; }
-    public void setOwnerPhone(String ownerPhone) { this.ownerPhone = ownerPhone; }
+    public Date getBookedFrom() {
+        return bookedFrom;
+    }
+
+    public void setBookedFrom(Date bookedFrom) {
+        this.bookedFrom = bookedFrom;
+    }
+
+    public Date getBookedTo() {
+        return bookedTo;
+    }
+
+    public void setBookedTo(Date bookedTo) {
+        this.bookedTo = bookedTo;
+    }
+
+    public String getRoomType() {
+        return roomType;
+    }
+
+    public void setRoomType(String roomType) {
+        this.roomType = roomType;
+    }
+
+    public double getPriceAtBooking() {
+        return priceAtBooking;
+    }
+
+    public void setPriceAtBooking(double priceAtBooking) {
+        this.priceAtBooking = priceAtBooking;
+    }
+
+    public String getPlaceTitle() {
+        return placeTitle;
+    }
+
+    public void setPlaceTitle(String placeTitle) {
+        this.placeTitle = placeTitle;
+    }
+
+    public String getPlaceImage() {
+        return placeImage;
+    }
+
+    public void setPlaceImage(String placeImage) {
+        this.placeImage = placeImage;
+    }
+
+    public String getOwnerPhone() {
+        return ownerPhone;
+    }
+
+    public void setOwnerPhone(String ownerPhone) {
+        this.ownerPhone = ownerPhone;
+    }
+
+    public String getPaypalOrderId() {
+        return paypalOrderId;
+    }
+
+    public void setPaypalOrderId(String paypalOrderId) {
+        this.paypalOrderId = paypalOrderId;
+    }
+
+    public String getPaypalCaptureId() {
+        return paypalCaptureId;
+    }
+
+    public void setPaypalCaptureId(String paypalCaptureId) {
+        this.paypalCaptureId = paypalCaptureId;
+    }
 
     @Override
-    public int hashCode() { return 3; }
+    public int hashCode() {
+        return 3;
+    }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
         final BookingEntity other = (BookingEntity) obj;
-        if (this.id != other.id) return false;
-        if (this.placeId != other.placeId) return false;
-        if (this.roomid != other.roomid) return false;
-        if (Double.doubleToLongBits(this.priceAtBooking) != Double.doubleToLongBits(other.priceAtBooking)) return false;
-        if (!Objects.equals(this.userid, other.userid)) return false;
-        if (!Objects.equals(this.firstName, other.firstName)) return false;
-        if (!Objects.equals(this.lastName, other.lastName)) return false;
-        if (!Objects.equals(this.bookedFrom, other.bookedFrom)) return false;
-        if (!Objects.equals(this.bookedTo, other.bookedTo)) return false;
-        if (!Objects.equals(this.roomType, other.roomType)) return false;
-        if (!Objects.equals(this.placeTitle, other.placeTitle)) return false;
-        if (!Objects.equals(this.placeImage, other.placeImage)) return false;
+        if (this.id != other.id) {
+            return false;
+        }
+        if (this.placeId != other.placeId) {
+            return false;
+        }
+        if (this.roomid != other.roomid) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.priceAtBooking) != Double.doubleToLongBits(other.priceAtBooking)) {
+            return false;
+        }
+        if (!Objects.equals(this.userid, other.userid)) {
+            return false;
+        }
+        if (!Objects.equals(this.firstName, other.firstName)) {
+            return false;
+        }
+        if (!Objects.equals(this.lastName, other.lastName)) {
+            return false;
+        }
+        if (!Objects.equals(this.bookedFrom, other.bookedFrom)) {
+            return false;
+        }
+        if (!Objects.equals(this.bookedTo, other.bookedTo)) {
+            return false;
+        }
+        if (!Objects.equals(this.roomType, other.roomType)) {
+            return false;
+        }
+        if (!Objects.equals(this.placeTitle, other.placeTitle)) {
+            return false;
+        }
+        if (!Objects.equals(this.placeImage, other.placeImage)) {
+            return false;
+        }
         return Objects.equals(this.ownerPhone, other.ownerPhone);
     }
 

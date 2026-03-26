@@ -6,49 +6,39 @@ import java.util.Date;
 public class BookingDto implements ApplicationDto {
 
     private long id;
-
     @NotNull
     private long placeId;
-
     @NotNull
     private long roomid;
-
     @NotNull
     private String userid;
-
     @NotNull
     private String firstName;
-
     @NotNull
     private String lastName;
-
-
     @NotNull
     private Date bookedFrom;
-
     @NotNull
     private Date bookedTo;
-
     @NotNull
     private String roomType;
-
     @NotNull
     private double priceAtBooking;
-
     @NotNull
     private String placeTitle;
-
     @NotNull
     private String placeImage;
-
     private String ownerPhone;
+    private String paypalOrderId;
+    private String paypalCaptureId;
 
     public BookingDto() {
     }
 
     public BookingDto(long id, long placeId, long roomid, String userid, String firstName, String lastName,
-                       Date bookedFrom, Date bookedTo, String roomType, double priceAtBooking,
-                      String placeTitle, String placeImage, String ownerPhone) {
+            Date bookedFrom, Date bookedTo, String roomType, double priceAtBooking,
+            String placeTitle, String placeImage, String ownerPhone,
+            String paypalOrderId, String paypalCaptureId) {
         this.id = id;
         this.placeId = placeId;
         this.roomid = roomid;
@@ -62,44 +52,127 @@ public class BookingDto implements ApplicationDto {
         this.placeTitle = placeTitle;
         this.placeImage = placeImage;
         this.ownerPhone = ownerPhone;
+        this.paypalOrderId = paypalOrderId;
+        this.paypalCaptureId = paypalCaptureId;
     }
 
-    public long getId() { return id; }
-    public void setId(long id) { this.id = id; }
+    public long getId() {
+        return id;
+    }
 
-    public long getPlaceId() { return placeId; }
-    public void setPlaceId(long placeId) { this.placeId = placeId; }
+    public void setId(long id) {
+        this.id = id;
+    }
 
-    public long getRoomid() { return roomid; }
-    public void setRoomid(long roomid) { this.roomid = roomid; }
+    public long getPlaceId() {
+        return placeId;
+    }
 
-    public String getUserid() { return userid; }
-    public void setUserid(String userid) { this.userid = userid; }
+    public void setPlaceId(long placeId) {
+        this.placeId = placeId;
+    }
 
-    public String getFirstName() { return firstName; }
-    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public long getRoomid() {
+        return roomid;
+    }
 
-    public String getLastName() { return lastName; }
-    public void setLastName(String lastName) { this.lastName = lastName; }
+    public void setRoomid(long roomid) {
+        this.roomid = roomid;
+    }
 
-    public Date getBookedFrom() { return bookedFrom; }
-    public void setBookedFrom(Date bookedFrom) { this.bookedFrom = bookedFrom; }
+    public String getUserid() {
+        return userid;
+    }
 
-    public Date getBookedTo() { return bookedTo; }
-    public void setBookedTo(Date bookedTo) { this.bookedTo = bookedTo; }
+    public void setUserid(String userid) {
+        this.userid = userid;
+    }
 
-    public String getRoomType() { return roomType; }
-    public void setRoomType(String roomType) { this.roomType = roomType; }
+    public String getFirstName() {
+        return firstName;
+    }
 
-    public double getPriceAtBooking() { return priceAtBooking; }
-    public void setPriceAtBooking(double priceAtBooking) { this.priceAtBooking = priceAtBooking; }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-    public String getPlaceTitle() { return placeTitle; }
-    public void setPlaceTitle(String placeTitle) { this.placeTitle = placeTitle; }
+    public String getLastName() {
+        return lastName;
+    }
 
-    public String getPlaceImage() { return placeImage; }
-    public void setPlaceImage(String placeImage) { this.placeImage = placeImage; }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
-    public String getOwnerPhone() { return ownerPhone; }
-    public void setOwnerPhone(String ownerPhone) { this.ownerPhone = ownerPhone; }
+    public Date getBookedFrom() {
+        return bookedFrom;
+    }
+
+    public void setBookedFrom(Date bookedFrom) {
+        this.bookedFrom = bookedFrom;
+    }
+
+    public Date getBookedTo() {
+        return bookedTo;
+    }
+
+    public void setBookedTo(Date bookedTo) {
+        this.bookedTo = bookedTo;
+    }
+
+    public String getRoomType() {
+        return roomType;
+    }
+
+    public void setRoomType(String roomType) {
+        this.roomType = roomType;
+    }
+
+    public double getPriceAtBooking() {
+        return priceAtBooking;
+    }
+
+    public void setPriceAtBooking(double priceAtBooking) {
+        this.priceAtBooking = priceAtBooking;
+    }
+
+    public String getPlaceTitle() {
+        return placeTitle;
+    }
+
+    public void setPlaceTitle(String placeTitle) {
+        this.placeTitle = placeTitle;
+    }
+
+    public String getPlaceImage() {
+        return placeImage;
+    }
+
+    public void setPlaceImage(String placeImage) {
+        this.placeImage = placeImage;
+    }
+
+    public String getOwnerPhone() {
+        return ownerPhone;
+    }
+
+    public void setOwnerPhone(String ownerPhone) {
+        this.ownerPhone = ownerPhone;
+    }
+
+    public String getPaypalOrderId() {
+        return paypalOrderId;
+    }
+
+    public void setPaypalOrderId(String paypalOrderId) {
+        this.paypalOrderId = paypalOrderId;
+    }
+
+    public String getPaypalCaptureId() {
+        return paypalCaptureId;
+    }
+
+    public void setPaypalCaptureId(String paypalCaptureId) {
+        this.paypalCaptureId = paypalCaptureId;
+    }
 }

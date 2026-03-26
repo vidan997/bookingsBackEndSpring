@@ -30,10 +30,10 @@ public class BookingServiceImp implements BookingService {
     private final RoomRepository roomRepository;
 
     public BookingServiceImp(BookingRepository bookingRepository,
-                             BookingConverter bookingConverter,
-                             PlaceRepository placeRepository,
-                             UserRepository userRepository,
-                             RoomRepository roomRepository) {
+            BookingConverter bookingConverter,
+            PlaceRepository placeRepository,
+            UserRepository userRepository,
+            RoomRepository roomRepository) {
         this.bookingRepository = bookingRepository;
         this.bookingConverter = bookingConverter;
         this.placeRepository = placeRepository;
@@ -104,6 +104,15 @@ public class BookingServiceImp implements BookingService {
         Long ownerId = Long.valueOf(place.getUserId());
         Optional<UserEntity> ownerOpt = userRepository.findById(ownerId);
         String ownerPhone = ownerOpt.map(UserEntity::getPhone).orElse(null);
+
+        long diff = bookingDto.getBookedTo().getTime() - bookingDto.getBookedFrom().getTime();
+        long nights = diff / (1000 * 60 * 60 * 24);
+        if (nights <= 0) {
+            nights = 1;
+        }
+        double totalPrice = room.getPrice() * nights;
+
+        bookingDto.setPriceAtBooking(totalPrice);
 
         bookingDto.setRoomType(room.getRoomType());
         bookingDto.setPriceAtBooking(room.getPrice());
