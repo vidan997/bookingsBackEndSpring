@@ -37,16 +37,6 @@ public class BookingRestController {
         return bookingService.findByPlaceId(placeId);
     }
 
-    @PostMapping("/save")
-    public ResponseEntity<Object> save(@RequestBody BookingDto bookingDto) {
-        try {
-            BookingDto saved = bookingService.save(bookingDto);
-            return ResponseEntity.status(HttpStatus.OK).body(saved);
-        } catch (EntityExistsException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
-        }
-    }
-
     @DeleteMapping("/delete/{id}")
     public void delete(@PathVariable Long id) throws InvalidEntityException {
         bookingService.deleteById(id);

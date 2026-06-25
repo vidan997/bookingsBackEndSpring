@@ -26,10 +26,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class PlaceRestController {
 
     private final PlaceService placeService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
-    public PlaceRestController(PlaceService placeService) {
+    public PlaceRestController(PlaceService placeService, ObjectMapper objectMapper) {
         this.placeService = placeService;
+        this.objectMapper = objectMapper;
     }
 
     @GetMapping("/all")
@@ -63,15 +64,19 @@ public class PlaceRestController {
             @RequestParam(value = "rooms", required = false) String roomsJson
     ) {
         try {
-            List<RoomDto> rooms = roomsJson != null && !roomsJson.isBlank()
-                    ? objectMapper.readValue(roomsJson, new TypeReference<List<RoomDto>>() {})
-                    : List.of();
+            List<RoomDto> rooms = parseRooms(roomsJson);
 
             PlaceDto placedto = placeService.saveMultipart(
-                    title, description,
-                    avaiableFrom, avaiableTo,
-                    userId, images, coverIndex, rooms
+                    title,
+                    description,
+                    avaiableFrom,
+                    avaiableTo,
+                    userId,
+                    images,
+                    coverIndex,
+                    rooms
             );
+
             return ResponseEntity.status(HttpStatus.OK).body(placedto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -89,14 +94,18 @@ public class PlaceRestController {
             @RequestParam(value = "rooms", required = false) String roomsJson
     ) {
         try {
-            List<RoomDto> rooms = roomsJson != null && !roomsJson.isBlank()
-                    ? objectMapper.readValue(roomsJson, new TypeReference<List<RoomDto>>() {})
-                    : List.of();
+            List<RoomDto> rooms = parseRooms(roomsJson);
 
             PlaceDto updated = placeService.updateMultipart(
-                    id, title, description,
-                    existingImages, images, coverIndex, rooms
+                    id,
+                    title,
+                    description,
+                    existingImages,
+                    images,
+                    coverIndex,
+                    rooms
             );
+
             return ResponseEntity.status(HttpStatus.OK).body(updated);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -111,5 +120,13 @@ public class PlaceRestController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
+    }
+
+    private List<RoomDto> parseRooms(String roomsJson) throws Exception {
+        if (roomsJson == null || roomsJson.isBlank()) {
+            return List.of();
+        }
+
+        return objectMapper.readValue(roomsJson, new TypeReference<List<RoomDto>>() {});
     }
 }

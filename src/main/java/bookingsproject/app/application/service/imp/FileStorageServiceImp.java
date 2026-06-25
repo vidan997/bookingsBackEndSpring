@@ -44,7 +44,6 @@ public class FileStorageServiceImp implements FileStorageService {
     public void deleteByUrl(String url) throws IOException {
         if (url == null || url.isBlank()) return;
 
-        // očekujemo format: /uploads/places/filename.jpg
         String filename = Paths.get(url).getFileName().toString();
         Path filePath = root.resolve(filename);
 

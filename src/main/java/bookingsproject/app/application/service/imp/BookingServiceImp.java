@@ -6,16 +6,21 @@ import bookingsproject.app.application.exception.InvalidEntityException;
 import bookingsproject.app.application.model.BookingEntity;
 import bookingsproject.app.application.model.PlaceEntity;
 import bookingsproject.app.application.model.RoomEntity;
+import bookingsproject.app.application.model.RoomSeasonPriceEntity;
 import bookingsproject.app.application.model.UserEntity;
 import bookingsproject.app.application.repository.BookingRepository;
 import bookingsproject.app.application.repository.PlaceRepository;
 import bookingsproject.app.application.repository.RoomRepository;
+import bookingsproject.app.application.repository.RoomSeasonPriceRepository;
 import bookingsproject.app.application.repository.UserRepository;
 import bookingsproject.app.application.service.BookingService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.transaction.Transactional;
-import java.util.Optional;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
@@ -28,17 +33,20 @@ public class BookingServiceImp implements BookingService {
     private final PlaceRepository placeRepository;
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
+    private final RoomSeasonPriceRepository roomSeasonPriceRepository;
 
     public BookingServiceImp(BookingRepository bookingRepository,
             BookingConverter bookingConverter,
             PlaceRepository placeRepository,
             UserRepository userRepository,
-            RoomRepository roomRepository) {
+            RoomRepository roomRepository,
+            RoomSeasonPriceRepository roomSeasonPriceRepository) {
         this.bookingRepository = bookingRepository;
         this.bookingConverter = bookingConverter;
         this.placeRepository = placeRepository;
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
+        this.roomSeasonPriceRepository = roomSeasonPriceRepository;
     }
 
     @Override
@@ -91,31 +99,27 @@ public class BookingServiceImp implements BookingService {
                 bookingDto.getBookedTo()
         );
 
-        long overlappingCount = bookingRepository.countOverlappingBookingsForRoom(
+        if (overlaps) {
+            throw new EntityExistsException("Selected room is already booked for chosen dates");
+        }
+
+        String ownerPhone = null;
+        try {
+            Long ownerId = Long.valueOf(place.getUserId());
+            Optional<UserEntity> ownerOpt = userRepository.findById(ownerId);
+            ownerPhone = ownerOpt.map(UserEntity::getPhone).orElse(null);
+        } catch (Exception e) {
+            ownerPhone = null;
+        }
+
+        double totalPrice = calculateTotalPrice(
                 bookingDto.getRoomid(),
                 bookingDto.getBookedFrom(),
                 bookingDto.getBookedTo()
         );
 
-        if (overlaps && overlappingCount >= room.getQuantity()) {
-            throw new EntityExistsException("Selected room type is fully booked for chosen dates");
-        }
-
-        Long ownerId = Long.valueOf(place.getUserId());
-        Optional<UserEntity> ownerOpt = userRepository.findById(ownerId);
-        String ownerPhone = ownerOpt.map(UserEntity::getPhone).orElse(null);
-
-        long diff = bookingDto.getBookedTo().getTime() - bookingDto.getBookedFrom().getTime();
-        long nights = diff / (1000 * 60 * 60 * 24);
-        if (nights <= 0) {
-            nights = 1;
-        }
-        double totalPrice = room.getPrice() * nights;
-
         bookingDto.setPriceAtBooking(totalPrice);
-
         bookingDto.setRoomType(room.getRoomType());
-        bookingDto.setPriceAtBooking(room.getPrice());
         bookingDto.setPlaceTitle(place.getTitle());
         bookingDto.setPlaceImage(place.getImageUrl());
         bookingDto.setOwnerPhone(ownerPhone);
@@ -128,4 +132,31 @@ public class BookingServiceImp implements BookingService {
     public void deleteById(Long id) throws InvalidEntityException {
         bookingRepository.deleteById(id);
     }
+
+    private double calculateTotalPrice(Long roomId, java.util.Date bookedFrom, java.util.Date bookedTo) {
+    LocalDate start = bookedFrom.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    LocalDate end = bookedTo.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+    BigDecimal total = BigDecimal.ZERO;
+    LocalDate current = start;
+
+    while (current.isBefore(end)) {
+        List<RoomSeasonPriceEntity> pricesForDay = roomSeasonPriceRepository
+                .findAllByRoomIdAndDateFromLessThanEqualAndDateToGreaterThanEqual(roomId, current, current);
+
+        if (pricesForDay.isEmpty()) {
+            throw new EntityExistsException("No seasonal price found for date: " + current);
+        }
+
+        BigDecimal maxPrice = pricesForDay.stream()
+                .map(RoomSeasonPriceEntity::getPricePerNight)
+                .max(BigDecimal::compareTo)
+                .orElseThrow(() -> new EntityExistsException("No seasonal price found for date"));
+
+        total = total.add(maxPrice);
+        current = current.plusDays(1);
+    }
+
+    return total.doubleValue();
+}
 }

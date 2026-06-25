@@ -1,4 +1,4 @@
-package bookingsproject.app.application.service.impl;
+package bookingsproject.app.application.service.implementation;
 
 import bookingsproject.app.application.dto.BookingDto;
 import bookingsproject.app.application.dto.CapturePayPalOrderRequestDto;
@@ -8,14 +8,18 @@ import bookingsproject.app.application.dto.CreatePayPalOrderResponseDto;
 import bookingsproject.app.application.model.PaymentHoldEntity;
 import bookingsproject.app.application.model.PlaceEntity;
 import bookingsproject.app.application.model.RoomEntity;
+import bookingsproject.app.application.model.RoomSeasonPriceEntity;
 import bookingsproject.app.application.repository.BookingRepository;
 import bookingsproject.app.application.repository.PaymentHoldRepository;
 import bookingsproject.app.application.repository.PlaceRepository;
 import bookingsproject.app.application.repository.RoomRepository;
+import bookingsproject.app.application.repository.RoomSeasonPriceRepository;
 import bookingsproject.app.application.service.BookingService;
 import bookingsproject.app.application.service.PayPalService;
-import jakarta.persistence.EntityExistsException;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,6 +41,7 @@ import org.springframework.web.client.RestTemplate;
 public class PayPalServiceImpl implements PayPalService {
 
     private final RoomRepository roomRepository;
+    private final RoomSeasonPriceRepository roomSeasonPriceRepository;
     private final PlaceRepository placeRepository;
     private final BookingRepository bookingRepository;
     private final PaymentHoldRepository paymentHoldRepository;
@@ -60,12 +65,16 @@ public class PayPalServiceImpl implements PayPalService {
     @Value("${paypal.hold-minutes}")
     private int holdMinutes;
 
-    public PayPalServiceImpl(RoomRepository roomRepository,
+    public PayPalServiceImpl(
+            RoomRepository roomRepository,
+            RoomSeasonPriceRepository roomSeasonPriceRepository,
             PlaceRepository placeRepository,
             BookingRepository bookingRepository,
             PaymentHoldRepository paymentHoldRepository,
-            BookingService bookingService) {
+            BookingService bookingService
+    ) {
         this.roomRepository = roomRepository;
+        this.roomSeasonPriceRepository = roomSeasonPriceRepository;
         this.placeRepository = placeRepository;
         this.bookingRepository = bookingRepository;
         this.paymentHoldRepository = paymentHoldRepository;
@@ -75,13 +84,18 @@ public class PayPalServiceImpl implements PayPalService {
     @Override
     public CreatePayPalOrderResponseDto createOrder(CreatePayPalOrderRequestDto requestDto) {
 
+        validateDates(requestDto.getBookedFrom(), requestDto.getBookedTo());
+
         PlaceEntity place = placeRepository.findById(requestDto.getPlaceId())
                 .orElseThrow(() -> new RuntimeException("Place not found"));
 
         RoomEntity room = roomRepository.findById(requestDto.getRoomId())
                 .orElseThrow(() -> new RuntimeException("Room not found"));
 
-        // ✅ PROVERA KOLIČINE (booking + hold)
+        if (room.getPlaceid() != place.getId()) {
+            throw new RuntimeException("Room does not belong to place");
+        }
+
         long bookings = bookingRepository.countOverlappingBookingsForRoom(
                 room.getId(),
                 requestDto.getBookedFrom(),
@@ -95,12 +109,17 @@ public class PayPalServiceImpl implements PayPalService {
                 new Date()
         );
 
-        if (bookings + holds >= room.getQuantity()) {
-            throw new RuntimeException("No available rooms");
+        if (bookings > 0 || holds > 0) {
+            throw new RuntimeException("Room is not available");
         }
 
-        long nights = calculateNights(requestDto.getBookedFrom(), requestDto.getBookedTo());
-        double totalEur = (room.getPrice() * nights) / rsdToEurRate;
+        double totalRsd = calculateTotalRsd(
+                room.getId(),
+                requestDto.getBookedFrom(),
+                requestDto.getBookedTo()
+        );
+
+        double totalEur = round2(totalRsd / rsdToEurRate);
 
         String token = getAccessToken();
         String orderId = createPayPalOrder(token, totalEur);
@@ -114,7 +133,7 @@ public class PayPalServiceImpl implements PayPalService {
         hold.setBookedTo(requestDto.getBookedTo());
         hold.setStatus("CREATED");
         hold.setCreatedAt(new Date());
-        hold.setExpiresAt(new Date(System.currentTimeMillis() + holdMinutes * 60_000));
+        hold.setExpiresAt(new Date(System.currentTimeMillis() + holdMinutes * 60_000L));
 
         paymentHoldRepository.save(hold);
 
@@ -122,53 +141,75 @@ public class PayPalServiceImpl implements PayPalService {
     }
 
     @Override
-public CapturePayPalOrderResponseDto captureOrder(CapturePayPalOrderRequestDto requestDto) {
+    public CapturePayPalOrderResponseDto captureOrder(CapturePayPalOrderRequestDto requestDto) {
 
-    PaymentHoldEntity hold = paymentHoldRepository.findByPaypalOrderId(requestDto.getPaypalOrderId())
-            .orElseThrow(() -> new RuntimeException("Hold not found"));
+        PaymentHoldEntity hold = paymentHoldRepository.findByPaypalOrderId(requestDto.getPaypalOrderId())
+                .orElseThrow(() -> new RuntimeException("Hold not found"));
 
-    if (!"CREATED".equals(hold.getStatus())) {
-        throw new RuntimeException("Invalid hold");
-    }
+        if (!"CREATED".equals(hold.getStatus())) {
+            throw new RuntimeException("Invalid hold");
+        }
 
-    if (hold.getExpiresAt().before(new Date())) {
-        hold.setStatus("EXPIRED");
+        if (hold.getExpiresAt().before(new Date())) {
+            hold.setStatus("EXPIRED");
+            paymentHoldRepository.save(hold);
+            throw new RuntimeException("Expired");
+        }
+
+        validateDates(hold.getBookedFrom(), hold.getBookedTo());
+
+        RoomEntity room = roomRepository.findById(hold.getRoomId())
+                .orElseThrow(() -> new RuntimeException("Room not found"));
+
+        long bookings = bookingRepository.countOverlappingBookingsForRoom(
+                room.getId(),
+                hold.getBookedFrom(),
+                hold.getBookedTo()
+        );
+
+        long holds = paymentHoldRepository.countActiveOverlappingHolds(
+                room.getId(),
+                hold.getBookedFrom(),
+                hold.getBookedTo(),
+                new Date()
+        );
+
+        if (bookings > 0 || holds > 1) {
+            throw new RuntimeException("Room is not available");
+        }
+
+        String token = getAccessToken();
+        Map<String, Object> res = capturePayPalOrder(token, requestDto.getPaypalOrderId());
+
+        if (!"COMPLETED".equals(res.get("status"))) {
+            throw new RuntimeException("Payment failed");
+        }
+
+        String captureId = extractCaptureId(res);
+
+        BookingDto dto = new BookingDto();
+        dto.setPlaceId(hold.getPlaceId());
+        dto.setRoomid(hold.getRoomId());
+        dto.setUserid(hold.getUserId());
+        dto.setFirstName(requestDto.getFirstName());
+        dto.setLastName(requestDto.getLastName());
+        dto.setBookedFrom(hold.getBookedFrom());
+        dto.setBookedTo(hold.getBookedTo());
+        dto.setPaypalOrderId(requestDto.getPaypalOrderId());
+        dto.setPaypalCaptureId(captureId);
+
+        BookingDto saved = bookingService.save(dto);
+
+        hold.setStatus("COMPLETED");
         paymentHoldRepository.save(hold);
-        throw new RuntimeException("Expired");
+
+        return new CapturePayPalOrderResponseDto(
+                saved,
+                requestDto.getPaypalOrderId(),
+                captureId,
+                "COMPLETED"
+        );
     }
-
-    String token = getAccessToken();
-    Map<String, Object> res = capturePayPalOrder(token, requestDto.getPaypalOrderId());
-
-    if (!"COMPLETED".equals(res.get("status"))) {
-        throw new RuntimeException("Payment failed");
-    }
-
-    String captureId = extractCaptureId(res);
-
-    BookingDto dto = new BookingDto();
-    dto.setPlaceId(hold.getPlaceId());
-    dto.setRoomid(hold.getRoomId());
-    dto.setUserid(hold.getUserId());
-    dto.setFirstName(requestDto.getFirstName());
-    dto.setLastName(requestDto.getLastName());
-    dto.setBookedFrom(hold.getBookedFrom());
-    dto.setBookedTo(hold.getBookedTo());
-    dto.setPaypalOrderId(requestDto.getPaypalOrderId());
-    dto.setPaypalCaptureId(captureId);
-
-    BookingDto saved = bookingService.save(dto);
-
-    hold.setStatus("COMPLETED");
-    paymentHoldRepository.save(hold);
-
-    return new CapturePayPalOrderResponseDto(
-            saved,
-            requestDto.getPaypalOrderId(),
-            captureId,
-            "COMPLETED"
-    );
-}
 
     private void validateDates(Date bookedFrom, Date bookedTo) {
         if (bookedFrom == null || bookedTo == null) {
@@ -180,10 +221,35 @@ public CapturePayPalOrderResponseDto captureOrder(CapturePayPalOrderRequestDto r
         }
     }
 
-    private long calculateNights(Date from, Date to) {
-        long diff = to.getTime() - from.getTime();
-        long nights = diff / (1000 * 60 * 60 * 24);
-        return nights <= 0 ? 1 : nights;
+    private double calculateTotalRsd(Long roomId, Date from, Date to) {
+        LocalDate start = from.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate end = to.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        BigDecimal total = BigDecimal.ZERO;
+        LocalDate current = start;
+
+        while (current.isBefore(end)) {
+            List<RoomSeasonPriceEntity> pricesForDay = roomSeasonPriceRepository
+                    .findAllByRoomIdAndDateFromLessThanEqualAndDateToGreaterThanEqual(
+                            roomId,
+                            current,
+                            current
+                    );
+
+            if (pricesForDay.isEmpty()) {
+                throw new RuntimeException("No seasonal price found for date: " + current);
+            }
+
+            BigDecimal maxPrice = pricesForDay.stream()
+                    .map(RoomSeasonPriceEntity::getPricePerNight)
+                    .max(BigDecimal::compareTo)
+                    .orElseThrow(() -> new RuntimeException("No seasonal price found for date"));
+
+            total = total.add(maxPrice);
+            current = current.plusDays(1);
+        }
+
+        return total.doubleValue();
     }
 
     private double round2(double value) {
@@ -194,7 +260,8 @@ public CapturePayPalOrderResponseDto captureOrder(CapturePayPalOrderRequestDto r
         RestTemplate restTemplate = new RestTemplate();
 
         String auth = clientId + ":" + clientSecret;
-        String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
+        String encodedAuth = Base64.getEncoder()
+                .encodeToString(auth.getBytes(StandardCharsets.UTF_8));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);

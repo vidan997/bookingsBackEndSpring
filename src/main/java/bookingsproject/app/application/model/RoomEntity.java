@@ -19,59 +19,89 @@ public class RoomEntity implements ApplicationEntity {
     @Column(name = "placeid")
     private long placeid;
 
+    @Column(name = "name")
+    private String name;
+
     @Column(name = "room_type")
     private String roomType;
 
-    private double price;
-
-    private int quantity;
+    @Column(name = "capacity")
+    private int capacity;
 
     public RoomEntity() {}
 
-    public RoomEntity(long id, long placeid, String roomType, double price, int quantity) {
+    public RoomEntity(long id, long placeid, String name, String roomType, int capacity) {
         this.id = id;
         this.placeid = placeid;
+        this.name = name;
         this.roomType = roomType;
-        this.price = price;
-        this.quantity = quantity;
+        this.capacity = capacity;
     }
 
-    public long getId() { return id; }
-    public void setId(long id) { this.id = id; }
+    public long getId() {
+        return id;
+    }
 
-    public long getPlaceid() { return placeid; }
-    public void setPlaceid(long placeid) { this.placeid = placeid; }
+    public void setId(long id) {
+        this.id = id;
+    }
 
-    public String getRoomType() { return roomType; }
-    public void setRoomType(String roomType) { this.roomType = roomType; }
+    public long getPlaceid() {
+        return placeid;
+    }
 
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price; }
+    public void setPlaceid(long placeid) {
+        this.placeid = placeid;
+    }
 
-    public int getQuantity() { return quantity; }
-    public void setQuantity(int quantity) { this.quantity = quantity; }
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getRoomType() {
+        return roomType;
+    }
+
+    public void setRoomType(String roomType) {
+        this.roomType = roomType;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
 
     @Override
     public int hashCode() {
-        return 7;
+        return Objects.hash(id, placeid, name, roomType, capacity);
     }
 
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
-        final RoomEntity other = (RoomEntity) obj;
-        if (this.id != other.id) return false;
-        if (this.placeid != other.placeid) return false;
-        if (Double.doubleToLongBits(this.price) != Double.doubleToLongBits(other.price)) return false;
-        if (this.quantity != other.quantity) return false;
-        return Objects.equals(this.roomType, other.roomType);
+        if (!(obj instanceof RoomEntity other)) return false;
+        return id == other.id
+                && placeid == other.placeid
+                && capacity == other.capacity
+                && Objects.equals(name, other.name)
+                && Objects.equals(roomType, other.roomType);
     }
 
     @Override
     public String toString() {
-        return "RoomEntity{" + "id=" + id + ", placeid=" + placeid + ", roomType=" + roomType
-                + ", price=" + price + ", quantity=" + quantity + '}';
+        return "RoomEntity{" +
+                "id=" + id +
+                ", placeid=" + placeid +
+                ", name='" + name + '\'' +
+                ", roomType='" + roomType + '\'' +
+                ", capacity=" + capacity +
+                '}';
     }
 }

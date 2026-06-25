@@ -1,13 +1,17 @@
-package bookingsproject.app.application.service.implementation;
+package bookingsproject.app.application.service.imp;
 
 import bookingsproject.app.application.converter.PlaceConverter;
 import bookingsproject.app.application.converter.RoomConverter;
+import bookingsproject.app.application.converter.RoomSeasonPriceConverter;
 import bookingsproject.app.application.dto.PlaceDto;
 import bookingsproject.app.application.dto.RoomDto;
+import bookingsproject.app.application.dto.RoomSeasonPriceDto;
 import bookingsproject.app.application.model.PlaceEntity;
 import bookingsproject.app.application.model.RoomEntity;
+import bookingsproject.app.application.model.RoomSeasonPriceEntity;
 import bookingsproject.app.application.repository.PlaceRepository;
 import bookingsproject.app.application.repository.RoomRepository;
+import bookingsproject.app.application.repository.RoomSeasonPriceRepository;
 import bookingsproject.app.application.service.FileStorageService;
 import bookingsproject.app.application.service.PlaceService;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -15,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityExistsException;
 import jakarta.transaction.Transactional;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +37,8 @@ public class PlaceServiceImp implements PlaceService {
     private final FileStorageService fileStorageService;
     private final RoomRepository roomRepository;
     private final RoomConverter roomConverter;
+    private final RoomSeasonPriceRepository roomSeasonPriceRepository;
+    private final RoomSeasonPriceConverter roomSeasonPriceConverter;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -40,13 +47,17 @@ public class PlaceServiceImp implements PlaceService {
             PlaceConverter placeConverter,
             FileStorageService fileStorageService,
             RoomRepository roomRepository,
-            RoomConverter roomConverter
+            RoomConverter roomConverter,
+            RoomSeasonPriceRepository roomSeasonPriceRepository,
+            RoomSeasonPriceConverter roomSeasonPriceConverter
     ) {
         this.placeRepository = placeRepository;
         this.placeConverter = placeConverter;
         this.fileStorageService = fileStorageService;
         this.roomRepository = roomRepository;
         this.roomConverter = roomConverter;
+        this.roomSeasonPriceRepository = roomSeasonPriceRepository;
+        this.roomSeasonPriceConverter = roomSeasonPriceConverter;
     }
 
     @Override
@@ -115,13 +126,7 @@ public class PlaceServiceImp implements PlaceService {
 
         PlaceEntity saved = placeRepository.save(entity);
 
-        if (rooms != null && !rooms.isEmpty()) {
-            for (RoomDto roomDto : rooms) {
-                roomDto.setPlaceid(saved.getId());
-                RoomEntity roomEntity = roomConverter.toEntity(roomDto);
-                roomRepository.save(roomEntity);
-            }
-        }
+        saveRoomsAndSeasonPrices(saved.getId(), rooms);
 
         return mapPlaceWithRooms(saved);
     }
@@ -177,18 +182,8 @@ public class PlaceServiceImp implements PlaceService {
 
         PlaceEntity saved = placeRepository.save(entity);
 
-        List<RoomEntity> existingRooms = roomRepository.findByPlaceid(saved.getId());
-        for (RoomEntity room : existingRooms) {
-            roomRepository.delete(room);
-        }
-
-        if (rooms != null && !rooms.isEmpty()) {
-            for (RoomDto roomDto : rooms) {
-                roomDto.setPlaceid(saved.getId());
-                RoomEntity roomEntity = roomConverter.toEntity(roomDto);
-                roomRepository.save(roomEntity);
-            }
-        }
+        deleteRoomsAndSeasonPrices(saved.getId());
+        saveRoomsAndSeasonPrices(saved.getId(), rooms);
 
         return mapPlaceWithRooms(saved);
     }
@@ -203,19 +198,86 @@ public class PlaceServiceImp implements PlaceService {
             fileStorageService.deleteByUrl(u);
         }
 
-        List<RoomEntity> existingRooms = roomRepository.findByPlaceid(entity.getId());
-        for (RoomEntity room : existingRooms) {
-            roomRepository.delete(room);
-        }
+        deleteRoomsAndSeasonPrices(entity.getId());
 
         placeRepository.delete(entity);
+    }
+
+    private void saveRoomsAndSeasonPrices(Long placeId, List<RoomDto> rooms) {
+        if (rooms == null || rooms.isEmpty()) {
+            return;
+        }
+
+        for (RoomDto roomDto : rooms) {
+            roomDto.setPlaceid(placeId);
+
+            RoomEntity roomEntity = roomConverter.toEntity(roomDto);
+            RoomEntity savedRoom = roomRepository.save(roomEntity);
+
+            if (roomDto.getSeasonPrices() != null && !roomDto.getSeasonPrices().isEmpty()) {
+                validateSeasonPrices(roomDto.getSeasonPrices());
+
+                for (RoomSeasonPriceDto seasonPriceDto : roomDto.getSeasonPrices()) {
+                    seasonPriceDto.setRoomId(savedRoom.getId());
+
+                    RoomSeasonPriceEntity seasonPriceEntity = roomSeasonPriceConverter.toEntity(seasonPriceDto);
+                    roomSeasonPriceRepository.save(seasonPriceEntity);
+                }
+            }
+        }
+    }
+
+    private void validateSeasonPrices(List<RoomSeasonPriceDto> seasonPrices) {
+        if (seasonPrices == null || seasonPrices.isEmpty()) {
+            return;
+        }
+
+        for (RoomSeasonPriceDto seasonPrice : seasonPrices) {
+            if (seasonPrice.getDateFrom() == null || seasonPrice.getDateTo() == null) {
+                throw new IllegalArgumentException("Season price dates are required");
+            }
+
+            if (seasonPrice.getDateFrom().isAfter(seasonPrice.getDateTo())) {
+                throw new IllegalArgumentException("Season price dateFrom must be before or equal to dateTo");
+            }
+
+            if (seasonPrice.getPricePerNight() == null) {
+                throw new IllegalArgumentException("Season price per night is required");
+            }
+
+            if (seasonPrice.getPricePerNight().doubleValue() < 0) {
+                throw new IllegalArgumentException("Season price per night must be greater than or equal to 0");
+            }
+        }
+    }
+
+    private void deleteRoomsAndSeasonPrices(Long placeId) {
+        List<RoomEntity> existingRooms = roomRepository.findByPlaceid(placeId);
+
+        for (RoomEntity room : existingRooms) {
+            List<RoomSeasonPriceEntity> seasonPrices = roomSeasonPriceRepository.findByRoomId(room.getId());
+            for (RoomSeasonPriceEntity seasonPrice : seasonPrices) {
+                roomSeasonPriceRepository.delete(seasonPrice);
+            }
+            roomRepository.delete(room);
+        }
     }
 
     private PlaceDto mapPlaceWithRooms(PlaceEntity placeEntity) {
         PlaceDto dto = placeConverter.toDto(placeEntity);
 
         List<RoomDto> rooms = roomRepository.findByPlaceid(placeEntity.getId()).stream()
-                .map(roomConverter::toDto)
+                .map(room -> {
+                    RoomDto roomDto = roomConverter.toDto(room);
+
+                    List<RoomSeasonPriceDto> seasonPrices = roomSeasonPriceRepository.findByRoomId(room.getId())
+                            .stream()
+                            .map(roomSeasonPriceConverter::toDto)
+                            .collect(Collectors.toList());
+
+                    roomDto.setSeasonPrices(seasonPrices);
+                    return roomDto;
+                })
                 .collect(Collectors.toList());
 
         dto.setRooms(rooms);
@@ -226,7 +288,8 @@ public class PlaceServiceImp implements PlaceService {
         if (json == null || json.isBlank()) {
             return new ArrayList<>();
         }
-        return objectMapper.readValue(json, new TypeReference<List<String>>() {});
+        return objectMapper.readValue(json, new TypeReference<List<String>>() {
+        });
     }
 
     private Date parseIsoDate(String iso) throws Exception {

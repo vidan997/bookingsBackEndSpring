@@ -37,6 +37,7 @@ public class UserRestController {
     public ResponseEntity<Object> signIn(@RequestBody UserDto request) {
         try {
             return ResponseEntity.ok(userService.signIn(request));
+            
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
         }

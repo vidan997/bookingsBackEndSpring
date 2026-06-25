@@ -1,6 +1,7 @@
 package bookingsproject.app.application.dto;
 
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 
 public class RoomDto implements ApplicationDto {
 
@@ -11,36 +12,73 @@ public class RoomDto implements ApplicationDto {
     private long placeid;
 
     @NotNull
+    private String name;
+
+    @NotNull
     private String roomType;
 
     @NotNull
-    private double price;
+    private int capacity;
 
-    @NotNull
-    private int quantity;
+    private List<RoomSeasonPriceDto> seasonPrices;
 
     public RoomDto() {}
 
-    public RoomDto(long id, long placeid, String roomType, double price, int quantity) {
+    public RoomDto(long id, long placeid, String name, String roomType, int capacity,
+                   List<RoomSeasonPriceDto> seasonPrices) {
         this.id = id;
         this.placeid = placeid;
+        this.name = name;
         this.roomType = roomType;
-        this.price = price;
-        this.quantity = quantity;
+        this.capacity = capacity;
+        this.seasonPrices = seasonPrices;
     }
 
-    public long getId() { return id; }
-    public void setId(long id) { this.id = id; }
+    public long getId() {
+        return id;
+    }
 
-    public long getPlaceid() { return placeid; }
-    public void setPlaceid(long placeid) { this.placeid = placeid; }
+    public void setId(long id) {
+        this.id = id;
+    }
 
-    public String getRoomType() { return roomType; }
-    public void setRoomType(String roomType) { this.roomType = roomType; }
+    public long getPlaceid() {
+        return placeid;
+    }
 
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price; }
+    public void setPlaceid(long placeid) {
+        this.placeid = placeid;
+    }
 
-    public int getQuantity() { return quantity; }
-    public void setQuantity(int quantity) { this.quantity = quantity; }
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getRoomType() {
+        return roomType;
+    }
+
+    public void setRoomType(String roomType) {
+        this.roomType = roomType;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public List<RoomSeasonPriceDto> getSeasonPrices() {
+        return seasonPrices;
+    }
+
+    public void setSeasonPrices(List<RoomSeasonPriceDto> seasonPrices) {
+        this.seasonPrices = seasonPrices;
+    }
 }

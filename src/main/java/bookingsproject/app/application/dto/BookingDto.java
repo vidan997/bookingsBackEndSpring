@@ -9,9 +9,9 @@ public class BookingDto implements ApplicationDto {
     @NotNull
     private long placeId;
     @NotNull
-    private long roomid;
+    private long roomId;
     @NotNull
-    private String userid;
+    private String userId;
     @NotNull
     private String firstName;
     @NotNull
@@ -41,8 +41,8 @@ public class BookingDto implements ApplicationDto {
             String paypalOrderId, String paypalCaptureId) {
         this.id = id;
         this.placeId = placeId;
-        this.roomid = roomid;
-        this.userid = userid;
+        this.roomId = roomid;
+        this.userId = userid;
         this.firstName = firstName;
         this.lastName = lastName;
         this.bookedFrom = bookedFrom;
@@ -73,19 +73,19 @@ public class BookingDto implements ApplicationDto {
     }
 
     public long getRoomid() {
-        return roomid;
+        return roomId;
     }
 
     public void setRoomid(long roomid) {
-        this.roomid = roomid;
+        this.roomId = roomid;
     }
 
     public String getUserid() {
-        return userid;
+        return userId;
     }
 
     public void setUserid(String userid) {
-        this.userid = userid;
+        this.userId = userid;
     }
 
     public String getFirstName() {

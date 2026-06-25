@@ -12,9 +12,9 @@ public class RoomConverter implements GenericConverter<RoomDto, RoomEntity> {
         return new RoomEntity(
                 dto.getId(),
                 dto.getPlaceid(),
+                dto.getName(),
                 dto.getRoomType(),
-                dto.getPrice(),
-                dto.getQuantity()
+                dto.getCapacity()
         );
     }
 
@@ -23,9 +23,10 @@ public class RoomConverter implements GenericConverter<RoomDto, RoomEntity> {
         return new RoomDto(
                 entity.getId(),
                 entity.getPlaceid(),
+                entity.getName(),
                 entity.getRoomType(),
-                entity.getPrice(),
-                entity.getQuantity()
+                entity.getCapacity(),
+                null // seasonPrices se puni u service sloju
         );
     }
 }
